@@ -1,40 +1,41 @@
 import { model, Schema, Document } from 'mongoose';
 
+const ratingRange = {
+    values: [null, '1', '2', '3', '4', '5'],
+    message: '{VALUE} no es una valoración valida'
+}
+
 const CommentSchema = new Schema ({
-    name: {
-        type: String,
-        required: [true, 'El nombre del usuario es necesario']
-    },
-	email: {
-        type: String,
-        required: [true, 'El correo es necesario'],
-        lowercase: true,    //minuscula
-        trim: true  //caso de otro correo con espacios
-    },
-	image: {
-        type: String,
-		default: null
-    },
-    content: {
-        type: String,
-        required: [true, 'El contenido del comentario es necesario'],
-    },
-    postId: {
-        type: String,
+    user: {
+        type: Schema.Types.ObjectId,
+		ref: 'User',
         required: true,
     },
+    post: {
+		type: Schema.Types.ObjectId,
+		ref: 'Post',
+		required: true
+    },
+	description: {
+		type: String,
+		required: [true, 'El contenido del comentario es necesario'],
+	},
+	rating: {
+		type: String,
+		default: null,
+		enum: ratingRange,
+	}
 },{
     versionKey:false,
     timestamps: true
 })
 
 export interface IComment extends Document {
-    name: String;
-    email: string;
-	image: string,
-    content: String;
-    postId: String;
-	createAt: Date;
+    user: String;
+    post: String;
+    description: String;
+    rating: string;
+	createdAt: Date;
 }
 
 export default model<IComment>('Comment', CommentSchema);

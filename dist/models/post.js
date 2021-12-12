@@ -15,18 +15,13 @@ const postSchema = new mongoose_1.Schema({
         type: String,
         default: null
     },
-    authorId: {
-        type: String,
-        required: true
+    user: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
     }
 }, {
     versionKey: false,
     timestamps: true
 });
-postSchema.methods.toJSON = function () {
-    const post = this;
-    const postObject = post.toObject();
-    delete postObject.user;
-    return postObject;
-};
 exports.default = mongoose_1.model('Post', postSchema);

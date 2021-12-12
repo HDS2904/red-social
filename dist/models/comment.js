@@ -1,29 +1,30 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
+const ratingRange = {
+    values: [null, '1', '2', '3', '4', '5'],
+    message: '{VALUE} no es una valoración valida'
+};
 const CommentSchema = new mongoose_1.Schema({
-    name: {
-        type: String,
-        required: [true, 'El nombre del usuario es necesario']
+    user: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
     },
-    email: {
-        type: String,
-        required: [true, 'El correo es necesario'],
-        lowercase: true,
-        trim: true //caso de otro correo con espacios
+    post: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'Post',
+        required: true
     },
-    image: {
-        type: String,
-        default: null
-    },
-    content: {
+    description: {
         type: String,
         required: [true, 'El contenido del comentario es necesario'],
     },
-    postId: {
+    rating: {
         type: String,
-        required: true,
-    },
+        default: null,
+        enum: ratingRange,
+    }
 }, {
     versionKey: false,
     timestamps: true

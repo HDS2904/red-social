@@ -18,59 +18,88 @@ const underscore_1 = __importDefault(require("underscore"));
 const getPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const desde = Number(req.query.desde || 0);
     const limite = Number(req.query.limite || 10);
-    const postDB = yield post_1.default.find({}, 'title content image authorId updatedAt createAt')
-        .skip(desde)
-        .limit(limite)
-        .exec();
-    if (!postDB) {
-        return res.status(400).json({
-            ok: false,
-            message: 'Ocurrio un error al obtener los datos'
+    try {
+        const postDB = yield post_1.default.find({}, 'title content image user updatedAt createdAt')
+            .skip(desde)
+            .limit(limite)
+            .populate('user', 'username image')
+            .exec();
+        if (!postDB) {
+            return res.status(400).json({
+                ok: false,
+                message: 'Ocurrio un error al obtener los datos'
+            });
+        }
+        const postN = yield post_1.default.countDocuments();
+        if (!postN && postN !== 0) {
+            return res.status(400).json({
+                ok: false,
+                message: 'Ocurrio un error al obtener los posts'
+            });
+        }
+        res.status(201).json({
+            ok: true,
+            post: postDB,
+            nDatos: postN
         });
     }
-    const postN = yield post_1.default.countDocuments();
-    if (!postN && postN !== 0) {
-        return res.status(400).json({
+    catch (error) {
+        res.status(400).json({
             ok: false,
-            message: 'Ocurrio un error al obtener los posts'
+            message: error
         });
     }
-    res.status(201).json({
-        ok: true,
-        post: postDB,
-        nDatos: postN
-    });
 });
 exports.getPost = getPost;
 const getPostById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
-    const postDB = yield post_1.default.findById(id);
-    if (!postDB) {
-        return res.status(400).json({
-            ok: false,
-            message: 'Ocurrio un error al obtener los datos del post'
+    try {
+        const postDB = yield post_1.default.findById(id)
+            .populate('user', 'username image')
+            .exec();
+        if (!postDB) {
+            return res.status(400).json({
+                ok: false,
+                message: 'Ocurrio un error al obtener los datos del post'
+            });
+        }
+        res.status(201).json({
+            ok: true,
+            post: postDB
         });
     }
-    res.status(201).json({
-        ok: true,
-        post: postDB
-    });
+    catch (error) {
+        res.status(400).json({
+            ok: false,
+            message: error
+        });
+    }
 });
 exports.getPostById = getPostById;
 const getPostByIdUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
-    const postDB = yield post_1.default.find({ authorId: id });
-    if (!postDB) {
-        return res.status(400).json({
-            ok: false,
-            message: 'Ocurrio un error al obtener los post del usuario'
+    try {
+        const postDB = yield post_1.default.find({ authorId: id })
+            .populate('user', 'username image')
+            .exec();
+        if (!postDB) {
+            return res.status(400).json({
+                ok: false,
+                message: 'Ocurrio un error al obtener los post del usuario'
+            });
+        }
+        res.status(201).json({
+            ok: true,
+            post: postDB,
+            nDatos: postDB === null || postDB === void 0 ? void 0 : postDB.length
         });
     }
-    res.status(201).json({
-        ok: true,
-        post: postDB,
-        nDatos: postDB === null || postDB === void 0 ? void 0 : postDB.length
-    });
+    catch (error) {
+        res.status(400).json({
+            ok: false,
+            message: error
+        });
+    }
 });
 exports.getPostByIdUser = getPostByIdUser;
 const postPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -80,51 +109,75 @@ const postPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         title: body.title,
         content: body.content,
         image: body.image,
-        authorId: id,
+        user: id,
     });
-    const postDB = yield post.save();
-    if (!postDB) {
-        return res.status(400).json({
-            ok: false,
-            message: 'Ocurrio un error al guardar el post'
+    try {
+        const postDB = yield post.save();
+        if (!postDB) {
+            return res.status(400).json({
+                ok: false,
+                message: 'Ocurrio un error al guardar el post'
+            });
+        }
+        res.status(201).json({
+            ok: true,
+            post: postDB
         });
     }
-    res.status(201).json({
-        ok: true,
-        post: postDB
-    });
+    catch (error) {
+        res.status(400).json({
+            ok: false,
+            message: error
+        });
+    }
 });
 exports.postPost = postPost;
 const putPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const body = underscore_1.default.pick(req.body, ['title', 'content', 'image']);
-    const postDB = yield post_1.default.findByIdAndUpdate(id, body, { new: true, runValidators: true });
-    if (!postDB) {
-        return res.status(400).json({
-            ok: false,
-            message: 'Ocurrio un error al editar el post'
+    try {
+        const postDB = yield post_1.default.findByIdAndUpdate(id, body, { new: true, runValidators: true });
+        if (!postDB) {
+            return res.status(400).json({
+                ok: false,
+                message: 'Ocurrio un error al editar el post'
+            });
+        }
+        res.status(201).json({
+            ok: true,
+            post: postDB
         });
     }
-    res.status(201).json({
-        ok: true,
-        post: postDB
-    });
+    catch (error) {
+        res.status(400).json({
+            ok: false,
+            message: error
+        });
+    }
 });
 exports.putPost = putPost;
 const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
-    const postDB = yield post_1.default.findByIdAndRemove(id);
-    if (!postDB) {
-        return res.status(400).json({
-            ok: false,
-            err: {
-                message: 'El post no existe'
-            }
+    try {
+        const postDB = yield post_1.default.findByIdAndRemove(id);
+        if (!postDB) {
+            return res.status(400).json({
+                ok: false,
+                err: {
+                    message: 'El post no existe'
+                }
+            });
+        }
+        res.json({
+            ok: true,
+            usuario: postDB
         });
     }
-    res.json({
-        ok: true,
-        usuario: postDB
-    });
+    catch (error) {
+        res.status(400).json({
+            ok: false,
+            message: error
+        });
+    }
 });
 exports.deletePost = deletePost;

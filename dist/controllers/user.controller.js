@@ -18,43 +18,59 @@ const underscore_1 = __importDefault(require("underscore"));
 const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const desde = Number(req.query.desde || 0);
     const limite = Number(req.query.limite || 10);
-    const userDB = yield user_1.default.find({ isActive: true }, 'username firstName lastName image email isStaff isActive updateAt')
-        .skip(desde)
-        .limit(limite)
-        .exec();
-    if (!userDB) {
-        return res.status(400).json({
-            ok: false,
-            message: 'Ocurrio un error al obtener los datos de los usuarios'
+    try {
+        const userDB = yield user_1.default.find({ isActive: true }, 'username firstName lastName image email isStaff isActive updateAt')
+            .skip(desde)
+            .limit(limite)
+            .exec();
+        if (!userDB) {
+            return res.status(400).json({
+                ok: false,
+                message: 'Ocurrio un error al obtener los datos de los usuarios'
+            });
+        }
+        const userN = yield user_1.default.countDocuments();
+        if (!userN && userN !== 0) {
+            return res.status(400).json({
+                ok: false,
+                message: 'Ocurrio un error al obtener los datos de los usuarios'
+            });
+        }
+        res.status(201).json({
+            ok: true,
+            users: userDB,
+            nDatos: userN
         });
     }
-    const userN = yield user_1.default.countDocuments();
-    if (!userN && userN !== 0) {
-        return res.status(400).json({
+    catch (error) {
+        res.status(400).json({
             ok: false,
-            message: 'Ocurrio un error al obtener los datos de los usuarios'
+            message: error
         });
     }
-    res.status(201).json({
-        ok: true,
-        users: userDB,
-        nDatos: userN
-    });
 });
 exports.getUser = getUser;
 const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
-    const userDB = yield user_1.default.findById(id);
-    if (!userDB) {
-        return res.status(400).json({
-            ok: false,
-            message: 'Ocurrio un error al obtener los datos del usuario'
+    try {
+        const userDB = yield user_1.default.findById(id);
+        if (!userDB) {
+            return res.status(400).json({
+                ok: false,
+                message: 'Ocurrio un error al obtener los datos del usuario'
+            });
+        }
+        res.status(201).json({
+            ok: true,
+            user: userDB
         });
     }
-    res.status(201).json({
-        ok: true,
-        user: userDB
-    });
+    catch (error) {
+        res.status(400).json({
+            ok: false,
+            message: error
+        });
+    }
 });
 exports.getUserById = getUserById;
 const postUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -69,52 +85,76 @@ const postUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         isStaff: body.isStaff,
         isActive: body.isActive,
     });
-    const userDB = yield user.save();
-    if (!userDB) {
-        return res.status(400).json({
-            ok: false,
-            message: 'Ocurrio un error al guardar el usuario'
+    try {
+        const userDB = yield user.save();
+        if (!userDB) {
+            return res.status(400).json({
+                ok: false,
+                message: 'Ocurrio un error al guardar el usuario'
+            });
+        }
+        res.status(201).json({
+            ok: true,
+            user: userDB
         });
     }
-    res.status(201).json({
-        ok: true,
-        user: userDB
-    });
+    catch (error) {
+        res.status(400).json({
+            ok: false,
+            message: error
+        });
+    }
 });
 exports.postUser = postUser;
 const putUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const body = underscore_1.default.pick(req.body, ['username', 'firstName', 'lastName', 'image', 'email', 'isActive']);
-    const userDB = yield user_1.default.findByIdAndUpdate(id, body, { new: true, runValidators: true });
-    if (!userDB) {
-        return res.status(400).json({
-            ok: false,
-            err: {
-                message: 'El usuario no existe'
-            }
+    try {
+        const userDB = yield user_1.default.findByIdAndUpdate(id, body, { new: true, runValidators: true });
+        if (!userDB) {
+            return res.status(400).json({
+                ok: false,
+                err: {
+                    message: 'El usuario no existe'
+                }
+            });
+        }
+        res.json({
+            ok: true,
+            usuario: userDB
         });
     }
-    res.json({
-        ok: true,
-        usuario: userDB
-    });
+    catch (error) {
+        res.status(400).json({
+            ok: false,
+            message: error
+        });
+    }
 });
 exports.putUser = putUser;
 const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const nuevoEstado = { isActive: false };
-    const userDB = yield user_1.default.findByIdAndUpdate(id, nuevoEstado, { new: true });
-    if (!userDB) {
-        return res.status(400).json({
-            ok: false,
-            err: {
-                message: 'El usuario no existe'
-            }
+    try {
+        const userDB = yield user_1.default.findByIdAndUpdate(id, nuevoEstado, { new: true });
+        if (!userDB) {
+            return res.status(400).json({
+                ok: false,
+                err: {
+                    message: 'El usuario no existe'
+                }
+            });
+        }
+        res.json({
+            ok: true,
+            user: userDB
         });
     }
-    res.json({
-        ok: true,
-        user: userDB
-    });
+    catch (error) {
+        res.status(400).json({
+            ok: false,
+            message: error
+        });
+    }
 });
 exports.deleteUser = deleteUser;

@@ -14,28 +14,22 @@ const postSchema = new Schema ({
         type: String,
 		default: null
     },
-    authorId: {
-        type: String,
-		required: true
+    user: {
+        type: Schema.Types.ObjectId,
+		ref: 'User',
+        required: true,
     }
 },{
     versionKey:false,
     timestamps: true
 })
 
-postSchema.methods.toJSON = function () {
-    const post = this;
-    const postObject = post.toObject();
-    delete postObject.user
-    return postObject;
-}
-
 export interface IPost extends Document {
     title: String;
     content: String;
     image: String;
-    authorId: String;
-	createAt: Date;
+    user: String;
+	createdAt: Date;
 	updateAt: Date;
 }
 
