@@ -12,12 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deletePost = exports.putPost = exports.postPost = exports.getPostById = exports.getPost = void 0;
+exports.deletePost = exports.putPost = exports.postPost = exports.getPostByIdUser = exports.getPostById = exports.getPost = void 0;
 const post_1 = __importDefault(require("../models/post"));
 const underscore_1 = __importDefault(require("underscore"));
 const getPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const desde = Number(req.query.desde || 0);
-    const limite = Number(req.query.limite || 5);
+    const limite = Number(req.query.limite || 10);
     const postDB = yield post_1.default.find({}, 'title content image authorId updatedAt createAt')
         .skip(desde)
         .limit(limite)
@@ -32,7 +32,7 @@ const getPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!postN && postN !== 0) {
         return res.status(400).json({
             ok: false,
-            message: 'Ocurrio un error al obtener los datos'
+            message: 'Ocurrio un error al obtener los posts'
         });
     }
     res.status(201).json({
@@ -57,10 +57,26 @@ const getPostById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     });
 });
 exports.getPostById = getPostById;
+const getPostByIdUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const postDB = yield post_1.default.find({ authorId: id });
+    if (!postDB) {
+        return res.status(400).json({
+            ok: false,
+            message: 'Ocurrio un error al obtener los post del usuario'
+        });
+    }
+    res.status(201).json({
+        ok: true,
+        post: postDB,
+        nDatos: postDB === null || postDB === void 0 ? void 0 : postDB.length
+    });
+});
+exports.getPostByIdUser = getPostByIdUser;
 const postPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
     const id = req.id;
-    let post = new post_1.default({
+    const post = new post_1.default({
         title: body.title,
         content: body.content,
         image: body.image,
@@ -70,7 +86,7 @@ const postPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!postDB) {
         return res.status(400).json({
             ok: false,
-            message: 'Ocurrio un error al obtener los datos'
+            message: 'Ocurrio un error al guardar el post'
         });
     }
     res.status(201).json({
@@ -86,7 +102,7 @@ const putPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!postDB) {
         return res.status(400).json({
             ok: false,
-            message: 'Ocurrio un error al editar el grupo'
+            message: 'Ocurrio un error al editar el post'
         });
     }
     res.status(201).json({
@@ -102,7 +118,7 @@ const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         return res.status(400).json({
             ok: false,
             err: {
-                message: 'El grupo no existe'
+                message: 'El post no existe'
             }
         });
     }

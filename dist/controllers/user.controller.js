@@ -17,22 +17,22 @@ const user_1 = __importDefault(require("../models/user"));
 const underscore_1 = __importDefault(require("underscore"));
 const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const desde = Number(req.query.desde || 0);
-    const limite = Number(req.query.limite || 5);
-    const userDB = yield user_1.default.find({ isActive: true }, 'username firstName lastName email isStaff isActive updateAt')
+    const limite = Number(req.query.limite || 10);
+    const userDB = yield user_1.default.find({ isActive: true }, 'username firstName lastName image email isStaff isActive updateAt')
         .skip(desde)
         .limit(limite)
         .exec();
     if (!userDB) {
         return res.status(400).json({
             ok: false,
-            message: 'Ocurrio un error al obtener los datos'
+            message: 'Ocurrio un error al obtener los datos de los usuarios'
         });
     }
     const userN = yield user_1.default.countDocuments();
     if (!userN && userN !== 0) {
         return res.status(400).json({
             ok: false,
-            message: 'Ocurrio un error al obtener los datos'
+            message: 'Ocurrio un error al obtener los datos de los usuarios'
         });
     }
     res.status(201).json({
@@ -48,7 +48,7 @@ const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     if (!userDB) {
         return res.status(400).json({
             ok: false,
-            message: 'Ocurrio un error al obtener los datos'
+            message: 'Ocurrio un error al obtener los datos del usuario'
         });
     }
     res.status(201).json({
@@ -63,6 +63,7 @@ const postUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         username: body.username,
         firstName: body.firstName,
         lastName: body.lastName,
+        image: body.image,
         email: body.email,
         password: body.password,
         isStaff: body.isStaff,
@@ -72,7 +73,7 @@ const postUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!userDB) {
         return res.status(400).json({
             ok: false,
-            message: 'Ocurrio un error al obtener los datos'
+            message: 'Ocurrio un error al guardar el usuario'
         });
     }
     res.status(201).json({
@@ -83,7 +84,7 @@ const postUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.postUser = postUser;
 const putUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
-    const body = underscore_1.default.pick(req.body, ['username', 'firstName', 'lastName', 'email', 'isActive']);
+    const body = underscore_1.default.pick(req.body, ['username', 'firstName', 'lastName', 'image', 'email', 'isActive']);
     const userDB = yield user_1.default.findByIdAndUpdate(id, body, { new: true, runValidators: true });
     if (!userDB) {
         return res.status(400).json({

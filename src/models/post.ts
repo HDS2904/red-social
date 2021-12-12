@@ -7,13 +7,16 @@ const postSchema = new Schema ({
         required: [true, 'El título del post es necesario']
     },
     content: {
-        type: String
+        type: String,
+		default: null
     },
 	image: {
-        type: String
+        type: String,
+		default: null
     },
     authorId: {
-        type: String
+        type: String,
+		required: true
     }
 },{
     versionKey:false,

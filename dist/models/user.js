@@ -21,13 +21,20 @@ const rolesDisp = {
 const userSchema = new mongoose_1.Schema({
     username: {
         type: String,
+        unique: true,
         required: [true, 'El username de usuario es necesario']
     },
     firstName: {
         type: String,
+        default: null
     },
     lastName: {
         type: String,
+        default: null
+    },
+    image: {
+        type: String,
+        default: null
     },
     email: {
         type: String,

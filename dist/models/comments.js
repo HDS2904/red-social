@@ -1,11 +1,11 @@
-import { model, Schema, Document } from 'mongoose';
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = require("mongoose");
 const ciclos = {
-    values: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ],
+    values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     message: '{VALUE} no es un ciclo valido'
-}
-
-const CourseSchema = new Schema ({
+};
+const CourseSchema = new mongoose_1.Schema({
     name: {
         type: String,
         unique: true,
@@ -26,13 +26,5 @@ const CourseSchema = new Schema ({
         type: String,
         required: false
     }
-})
-
-export interface ICourse extends Document {
-    name: String;
-    ciclo: number;
-    group: String;
-    description: String;
-}
-
-export default model<ICourse>('Course', CourseSchema);
+});
+exports.default = mongoose_1.model('Course', CourseSchema);
