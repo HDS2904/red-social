@@ -20,7 +20,7 @@ const getUser = async ( req: Request, res: Response ) => {
 
 	const userN = await User.countDocuments();
 
-	if ( !userN ) {
+	if ( !userN && userN!==0 ) {
 		return res.status(400).json({
 			ok:false,
 			message: 'Ocurrio un error al obtener los datos'
@@ -66,8 +66,6 @@ const postUser = async ( req: Request, res: Response ) => {
     })
 
     const userDB = await user.save()
-
-	console.log("userDB")
 
 	if ( !userDB ) {
         return res.status(400).json({

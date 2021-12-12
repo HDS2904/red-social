@@ -1,6 +1,7 @@
-import { model, Schema, Document } from 'mongoose';
-
-const postSchema = new Schema ({
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = require("mongoose");
+const postSchema = new mongoose_1.Schema({
     title: {
         type: String,
         unique: true,
@@ -9,31 +10,20 @@ const postSchema = new Schema ({
     content: {
         type: String
     },
-	image: {
+    image: {
         type: String
     },
     authorId: {
         type: String
     }
-},{
-    versionKey:false,
+}, {
+    versionKey: false,
     timestamps: true
-})
-
+});
 postSchema.methods.toJSON = function () {
     const post = this;
     const postObject = post.toObject();
-    delete postObject.user
+    delete postObject.user;
     return postObject;
-}
-
-export interface IPost extends Document {
-    title: String;
-    content: String;
-    image: String;
-    authorId: String;
-	createAt: Date;
-	updateAt: Date;
-}
-
-export default model<IPost>('Post', postSchema);
+};
+exports.default = mongoose_1.model('Post', postSchema);
